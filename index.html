@@ -1,0 +1,65 @@
+<html>
+  
+
+
+## SLIP 1
+
+CREATE TABLE Dept (
+    dno INT PRIMARY KEY,
+    dname VARCHAR(50) NOT NULL,
+    loc VARCHAR(50)
+);
+
+CREATE TABLE Emp (
+    eno INT PRIMARY KEY,
+    ename VARCHAR(50) NOT NULL,
+    designation VARCHAR(50),
+    salary DECIMAL(10,2) CHECK (salary > 0),
+    Date_Of_Joining DATE,
+    dno INT,
+    FOREIGN KEY (dno) REFERENCES Dept(dno)
+);
+
+-- Inserting data into Dept table
+INSERT INTO Dept (dno, dname, loc) VALUES
+(1, 'Account Department', 'Pune'),
+(2, 'Quality', 'Mumbai'),
+(3, 'Computer Science', 'Bangalore');
+
+-- Inserting data into Emp table
+INSERT INTO Emp (eno, ename, designation, salary, Date_Of_Joining, dno) VALUES
+(101, 'Mr. Manager', 'Manager', 80000.00, '2020-01-01', 1),
+(102, 'Mr. Advait', 'Staff', 60000.00, '2018-05-15', 1),
+(103, 'Mr. Roy', 'Staff', 55000.00, '2017-07-20', 3),
+(104, 'Mr. Ankit', 'Manager', 70000.00, '2019-02-10', 2),
+(105, 'Ms. Priya', 'Staff', 65000.00, '2018-10-05', 2),
+(106, 'Mr. John', 'Staff', 50000.00, '2020-03-12', 3),
+(107, 'Ms. Maya', 'Staff', 45000.00, '2021-04-25', 2);
+
+
+SELECT d.dname AS Department, COUNT(e.eno) AS Employee_Count
+FROM Dept d
+LEFT JOIN Emp e ON d.dno = e.dno
+GROUP BY d.dname;
+
+SELECT e.ename
+FROM Emp e
+JOIN Dept d ON e.dno = d.dno
+WHERE e.designation = 'Manager' AND d.dname = 'Account Department';
+
+SELECT d.dname AS Department
+FROM Dept d
+JOIN Emp e ON d.dno = e.dno
+WHERE d.loc = 'Pune' AND e.ename = 'Mr. Advait';
+
+SELECT e.ename
+FROM Emp e
+JOIN Dept d ON e.dno = d.dno
+WHERE e.salary > 50000 AND d.dname = 'Quality';
+
+UPDATE Emp
+SET Date_Of_Joining = '2019-06-15'
+WHERE ename = 'Mr. Roy' AND dno IN (SELECT dno FROM Dept WHERE dname = 'Computer Science');
+
+
+</html>
