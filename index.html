@@ -190,7 +190,67 @@ JOIN Customer_Loan cl ON c.cust_no = cl.cust_no
 JOIN Loan l ON cl.loan_no = l.loan_no
 WHERE c.city = 'Pimpri'
 ORDER BY c.cust_name DESC;
+----------------------------------------------------        
+## SLIP 3
+-- Creating the Hospital table
+CREATE TABLE Hospital (
+    hno INT PRIMARY KEY,
+    hname VARCHAR(100),
+    city VARCHAR(50),
+    Est_year INT CHECK (Est_year > 1990),
+    addr VARCHAR(255)
+);
 
+-- Creating the Doctor table
+CREATE TABLE Doctor (
+    dno INT PRIMARY KEY,
+    dname VARCHAR(100),
+    addr VARCHAR(255),
+    Speciality VARCHAR(100),
+    hno INT,
+    FOREIGN KEY (hno) REFERENCES Hospital(hno)
+);
+-- Inserting values into the Hospital table
+INSERT INTO Hospital (hno, hname, city, Est_year, addr)
+VALUES 
+    (1, 'Ruby Hospital', 'Pune', 1995, '123 Main Street'),
+    (2, 'Sapphire Hospital', 'Pimpri', 2000, '456 Oak Avenue'),
+    (3, 'Birla Hospital', 'Chinchwad', 1992, '789 Elm Street');
+
+-- Inserting values into the Doctor table
+INSERT INTO Doctor (dno, dname, addr, Speciality, hno)
+VALUES 
+    (101, 'Dr. Smith', '101 First Street', 'Cardiology', 1),
+    (102, 'Dr. Johnson', '202 Second Street', 'Orthopedics', 1),
+    (103, 'Dr. Williams', '303 Third Street', 'Pediatrics', 2),
+    (104, 'Dr. Brown', '404 Fourth Street', 'Oncology', 3),
+    (105, 'Dr. Wilson', '505 Fifth Street', 'Neurology', 3);
+select * from hospital;
+select * from doctor;
+-- Deleting the addr column from the Hospital table
+ALTER TABLE Hospital
+DROP COLUMN addr;
+select * from hospital;
+SELECT d.dname AS Doctor_Name, h.hname AS Hospital_Name, d.Speciality AS Specialty
+FROM Doctor d
+JOIN Hospital h ON d.hno = h.hno
+WHERE h.city = 'Pune';
+SELECT hname
+FROM Hospital
+WHERE city = 'Pimpri';
+SELECT d.dname AS Doctor_Name
+FROM Doctor d
+JOIN Hospital h ON d.hno = h.hno
+WHERE h.hname = 'Birla Hospital' AND h.city = 'Chinchwad';
+SELECT Speciality
+FROM Doctor
+WHERE hno = (
+    SELECT hno
+    FROM Hospital
+    WHERE hname = 'Ruby Hospital'
+);
+
+        
 </code>
 </pre>
 </body>
