@@ -434,6 +434,95 @@ SELECT m.mname, a.title, a.copy_right_date, a.format
 FROM Musician m
 JOIN Album a ON m.mno = a.mno
 ORDER BY m.mname;
+--------------------------------------------------------
+    ## SLIP 26
+CREATE TABLE ITEM (
+    Item_No INT PRIMARY KEY,
+    Item_Name VARCHAR(50),
+    Unit_of_Measure VARCHAR(20)
+);
+
+CREATE TABLE SUPPLIER (
+    S_No INT PRIMARY KEY,
+    S_Name VARCHAR(50),
+    S_Addr VARCHAR(100),
+    S_City VARCHAR(50)
+);
+
+CREATE TABLE CUSTOMER (
+    C_no INT PRIMARY KEY,
+    C_name VARCHAR(50),
+    C_Addr VARCHAR(100),
+    C_City VARCHAR(50)
+);
+
+CREATE TABLE SUPPLY (
+    Item_No INT,
+    S_No INT,
+    C_no INT,
+    Cost DECIMAL(10, 2),
+    FOREIGN KEY (Item_No) REFERENCES ITEM(Item_No),
+    FOREIGN KEY (S_No) REFERENCES SUPPLIER(S_No),
+    FOREIGN KEY (C_no) REFERENCES CUSTOMER(C_no),
+    PRIMARY KEY (Item_No, S_No, C_no)
+);
+-- Sample data for ITEM
+INSERT INTO ITEM (Item_No, Item_Name, Unit_of_Measure)
+VALUES
+    (1, 'Monitor', 'Piece'),
+    (2, 'Keyboard', 'Piece'),
+    (3, 'Mouse', 'Piece');
+
+-- Sample data for SUPPLIER
+INSERT INTO SUPPLIER (S_No, S_Name, S_Addr, S_City)
+VALUES
+    (101, 'DIGITAL COMPONENTS', '123 Main Street', 'New York'),
+    (102, 'TechMart', '456 Broadway', 'Los Angeles'),
+    (103, 'Electro World', '789 Oak Avenue', 'Chicago');
+
+-- Sample data for CUSTOMER
+INSERT INTO CUSTOMER (C_no, C_name, C_Addr, C_City)
+VALUES
+    (201, 'ABC Ltd', '1001 Elm Street', 'New York'),
+    (202, 'XYZ Inc', '2002 Maple Avenue', 'Los Angeles'),
+    (203, 'LMN Corp', '3003 Oak Street', 'Chicago');
+
+-- Sample data for SUPPLY
+INSERT INTO SUPPLY (Item_No, S_No, C_no, Cost)
+VALUES
+    (1, 101, 201, 150.00),  -- Monitor supplied by DIGITAL COMPONENTS to ABC Ltd
+    (2, 102, 202, 30.00),   -- Keyboard supplied by TechMart to XYZ Inc
+    (1, 102, 201, 160.00),  -- Monitor supplied by TechMart to ABC Ltd
+    (2, 101, 203, 35.00),   -- Keyboard supplied by DIGITAL COMPONENTS to LMN Corp
+    (3, 103, 201, 15.00);   -- Mouse supplied by Electro World to ABC Ltd
+
+
+SELECT AVG(Cost) AS Average_Cost
+FROM SUPPLY
+WHERE S_No = (SELECT S_No FROM SUPPLIER WHERE S_Name = 'DIGITAL COMPONENTS')
+AND Item_No = (SELECT Item_No FROM ITEM WHERE Item_Name = 'Monitor');
+
+
+SELECT S.S_Name AS Supplier_Name, C.C_name AS Customer_Name
+FROM SUPPLY AS S1
+JOIN SUPPLIER AS S ON S1.S_No = S.S_No
+JOIN CUSTOMER AS C ON S1.C_no = C.C_no
+WHERE S1.Item_No = (SELECT Item_No FROM ITEM WHERE Item_Name = 'Keyboard')
+AND S1.Cost > (SELECT MAX(Cost) FROM SUPPLY WHERE Item_No = S1.Item_No);
+
+
+SELECT I.Item_Name
+FROM SUPPLY AS S
+JOIN ITEM AS I ON S.Item_No = I.Item_No
+JOIN CUSTOMER AS C ON S.C_no = C.C_no
+WHERE C.C_name = 'ABC Ltd';
+
+
+SELECT DISTINCT S.S_Name AS Supplier_Name
+FROM SUPPLIER AS S
+JOIN SUPPLY AS S1 ON S.S_No = S1.S_No
+JOIN CUSTOMER AS C ON S1.C_no = C.C_no
+WHERE S.S_City = C.C_City;    
     
 
 
