@@ -522,13 +522,57 @@ SELECT DISTINCT S.S_Name AS Supplier_Name
 FROM SUPPLIER AS S
 JOIN SUPPLY AS S1 ON S.S_No = S1.S_No
 JOIN CUSTOMER AS C ON S1.C_no = C.C_no
-WHERE S.S_City = C.C_City;    
-    
+WHERE S.S_City = C.C_City;  
+------------------------------------------------------------    
+ ## SLIP 2
+ -- Create Client table
+CREATE TABLE Client (
+    clientNo VARCHAR(10) PRIMARY KEY,
+    ClientName VARCHAR(100) NOT NULL,
+    addr VARCHAR(255)
+);
 
+-- Create Sales_order table
+CREATE TABLE Sales_order (
+    ordNo INT PRIMARY KEY,
+    ordDate DATE NOT NULL,
+    clientNo VARCHAR(10),
+    FOREIGN KEY (clientNo) REFERENCES Client(clientNo)
+);
 
+-- Add constraint for Sales_order table
+ALTER TABLE Sales_order ADD CONSTRAINT check_ordDate_not_null CHECK (ordDate IS NOT NULL);
 
+ALTER TABLE Sales_order 
+ADD amount INT;
 
+-- Sample data for Client table
+INSERT INTO Client (clientNo, ClientName, addr) VALUES 
+('CN001', 'John Doe', '123 Main St'),
+('CN002', 'Jane Smith', '456 Oak St'),
+('CN003', 'Patil', '789 Elm St');
 
+-- Sample data for Sales_order table
+INSERT INTO Sales_order (ordNo, ordDate, clientNo, amount) VALUES 
+(1, '2019-08-09', 'CN001', 100),
+(2, '2019-08-09', 'CN002', 150),
+(3, '2019-08-10', 'CN001', 200),
+(4, '2019-08-10', 'CN003', 250);
+
+DELETE FROM Client 
+WHERE ClientName LIKE 'A%';
+
+DELETE FROM Sales_order 
+WHERE clientNo IN (SELECT clientNo FROM Client WHERE ClientName = 'Patil') 
+AND ordDate = '2019-08-09';
+
+UPDATE Sales_order 
+SET ordDate = '2019-03-18' 
+WHERE clientNo = 'CN001' AND ordDate = '2019-03-18';
+
+SELECT ordDate, COUNT(*) AS orderCount 
+FROM Sales_order 
+GROUP BY ordDate;
         
 </code>
 </pre>
