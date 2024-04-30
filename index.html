@@ -111,6 +111,86 @@ WHERE B.RoomNo = 101;
 
 SELECT Disease  FROM Patient WHERE PCode = 1; -- Assuming Bed_No is the same as PCode  
 
+-------------------------------------
+## SLIP 5
+    
+CREATE TABLE Customer (
+    cust_no INT PRIMARY KEY,
+    cust_name VARCHAR(100),
+    address VARCHAR(255),
+    city VARCHAR(100)
+);
+ALTER TABLE Customer
+ADD Phone_No INT;
+
+CREATE TABLE Loan (
+    loan_no INT PRIMARY KEY,
+    loan_amt DECIMAL(12, 2) CHECK (loan_amt > 0)
+);
+
+CREATE TABLE Customer_Loan (
+    cust_no INT,
+    loan_no INT,
+    PRIMARY KEY (cust_no, loan_no),
+    FOREIGN KEY (cust_no) REFERENCES Customer(cust_no) ON DELETE CASCADE,
+    FOREIGN KEY (loan_no) REFERENCES Loan(loan_no) ON DELETE CASCADE
+);
+
+INSERT INTO Customer (cust_no, cust_name, address, city, Phone_No)
+VALUES
+    (1, 'John Doe', '123 Main St', 'New York', 1234567890),
+    (2, 'Jane Smith', '456 Elm St', 'Los Angeles', 9876543210),
+    (3, 'Alice Johnson', '789 Oak St', 'Chicago', 5551234567),
+    (4, 'David Brown', '101 Pine St', 'Pimpri', 1112223333),
+    (5, 'Daniel Clark', '321 Maple St', 'Pune', 9998887777),
+    (6, 'Diana White', '555 Cedar St', 'Pimpri', 7776665555);
+
+INSERT INTO Loan (loan_no, loan_amt)
+VALUES
+    (101, 15000.00),
+    (102, 5000.00),
+    (103, 2000000.00),
+    (104, 800.00),
+    (105, 1200000.00),
+    (106, 10000.00);
+
+INSERT INTO Customer_Loan (cust_no, loan_no)
+VALUES
+    (1, 101),
+    (2, 102),
+    (3, 103),
+    (4, 104),
+    (5, 105),
+    (6, 106);
+
+DELETE FROM Customer
+WHERE cust_no IN (
+    SELECT cl.cust_no
+    FROM Customer_Loan cl
+    JOIN Loan l ON cl.loan_no = l.loan_no
+    WHERE l.loan_amt < 1000
+);
+
+        
+SELECT c.*
+FROM Customer c
+JOIN Customer_Loan cl ON c.cust_no = cl.cust_no
+JOIN Loan l ON cl.loan_no = l.loan_no
+WHERE l.loan_amt > 1000000;
+
+        
+SELECT *
+FROM Customer
+WHERE cust_name LIKE 'D%';
+
+
+SELECT c.cust_name
+FROM Customer c
+JOIN Customer_Loan cl ON c.cust_no = cl.cust_no
+JOIN Loan l ON cl.loan_no = l.loan_no
+WHERE c.city = 'Pimpri'
+ORDER BY c.cust_name DESC;
+
 </code>
 </pre>
 </body>
