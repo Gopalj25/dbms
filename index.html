@@ -249,8 +249,58 @@ WHERE hno = (
     FROM Hospital
     WHERE hname = 'Ruby Hospital'
 );
-
+----------------------------------------------------------
+ ## SLIP 20
         
+ -- Creating tables
+CREATE TABLE Country (
+    con_code INT PRIMARY KEY,
+    name VARCHAR(50) NOT NULL,
+    capital VARCHAR(50) NOT NULL
+);
+
+CREATE TABLE Population (
+    pop_code INT PRIMARY KEY,
+    population INT,
+    FOREIGN KEY (pop_code) REFERENCES Country(con_code)
+);
+
+-- Inserting sample data
+INSERT INTO Country (con_code, name, capital)
+VALUES 
+    (1, 'India', 'Delhi'),
+    (2, 'USA', 'Washington DC'),
+    (3, 'China', 'Beijing');
+
+INSERT INTO Population (pop_code, population)
+VALUES 
+    (1, 1380000000), -- India
+    (2, 331000000),  -- USA
+    (3, 1440000000); -- China
+
+-- Queries
+-- 1. Name and population of country whose capital is ‘Delhi’
+SELECT c.name, p.population
+FROM Country c
+JOIN Population p ON c.con_code = p.pop_code
+WHERE c.capital = 'Delhi';
+
+-- 2. Count the number of countries whose population is > 60,00,000
+SELECT COUNT(*)
+FROM Population
+WHERE population > 60000000;
+
+-- 3. Find the country details with highest population
+SELECT c.name, p.population
+FROM Country c
+JOIN Population p ON c.con_code = p.pop_code
+WHERE p.population = (SELECT MAX(population) FROM Population);
+
+-- 4. Display country wise population details
+SELECT c.name, p.population
+FROM Country c
+JOIN Population p ON c.con_code = p.pop_code;
+       
 </code>
 </pre>
 </body>
