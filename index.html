@@ -362,7 +362,79 @@ AND rate = (SELECT MIN(rate) FROM Property WHERE owner_name = 'Mr. Patil');
 DELETE FROM Property 
 WHERE area = 'Pune' 
 AND owner_name = 'Mr. Joshi';
+---------------------------------------------------------    
+## SLIP 16
+-- Create Musician table
+CREATE TABLE Musician (
+    mno INT PRIMARY KEY,
+    mname VARCHAR(100),
+    addr VARCHAR(255),
+    phno VARCHAR(15)
+);
 
+-- Create Album table
+CREATE TABLE Album (
+    title VARCHAR(100) PRIMARY KEY,
+    copy_right_date DATE,
+    format VARCHAR(50),
+    mno INT,
+    FOREIGN KEY (mno) REFERENCES Musician(mno)
+);
+
+-- Insert sample data into Musician table
+INSERT INTO Musician (mno, mname, addr, phno)
+VALUES
+    (1, 'A R Rehman', 'Chennai', '9876543210'),
+    (2, 'Hans Zimmer', 'Los Angeles', '1234567890'),
+    (3, 'John Williams', 'New York', '5678901234'),
+    (4, 'James Horner', 'Los Angeles', '6789012345');
+
+-- Insert sample data into Album table
+INSERT INTO Album (title, copy_right_date, format, mno)
+VALUES
+    ('Jodhaa Akbar', '2008-02-12', 'Audio', 1),
+    ('Dil Se', '1998-08-21', 'Audio', 1),
+    ('The Dark Knight', '2008-07-18', 'Audio', 2),
+    ('Inception', '2010-07-16', 'Audio', 2),
+    ('Jurassic Park', '1993-06-11', 'Audio', 3),
+    ('Star Wars', '1977-05-25', 'Audio', 3),
+    ('Titanic', '1997-11-18', 'Audio', 4),
+    ('Avatar', '2009-12-18', 'Audio', 4),
+    ('Lagaan', '2001-06-15', 'Audio', 1),
+    ('Rang De Basanti', '2006-01-26', 'Audio', 1);
+
+-- Execute the queries
+
+-- 1. Display all albums composed by ‘A R Rehman’
+SELECT *
+FROM Album
+WHERE mno = (SELECT mno FROM Musician WHERE mname = 'A R Rehman');
+
+-- 2. Display musician details who have composed Audio album
+SELECT m.*
+FROM Musician m
+JOIN Album a ON m.mno = a.mno
+WHERE a.format = 'Audio';
+
+-- 3. Find all musicians who have composed maximum albums
+SELECT m.mname, COUNT(a.title) AS album_count
+FROM Musician m
+LEFT JOIN Album a ON m.mno = a.mno
+GROUP BY m.mno
+HAVING COUNT(a.title) = (
+    SELECT COUNT(title)
+    FROM Album
+    GROUP BY mno
+    ORDER BY COUNT(title) DESC
+    LIMIT 1
+);
+
+-- 4. Display musician wise album details
+SELECT m.mname, a.title, a.copy_right_date, a.format
+FROM Musician m
+JOIN Album a ON m.mno = a.mno
+ORDER BY m.mname;
+    
 
 
 
