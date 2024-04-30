@@ -300,7 +300,75 @@ WHERE p.population = (SELECT MAX(population) FROM Population);
 SELECT c.name, p.population
 FROM Country c
 JOIN Population p ON c.con_code = p.pop_code;
-       
+-------------------------------------------------------------- 
+## SLIP 9
+        
+CREATE TABLE Owner (
+    owner_name VARCHAR(255) PRIMARY KEY,
+    addr VARCHAR(255),
+    phno VARCHAR(15)
+);
+
+CREATE TABLE Property (
+    pno INT PRIMARY KEY,
+    desc VARCHAR(255),
+    area DECIMAL(10,2),
+    rate DECIMAL(10,2) CHECK (rate > 0),
+    owner_name VARCHAR(255),
+    FOREIGN KEY (owner_name) REFERENCES Owner(owner_name)
+);
+-- Inserting data into Owner table
+INSERT INTO Owner (owner_name, addr, phno) VALUES 
+('Mr. Smith', '123 Main St, Mumbai', '123-456-7890'),
+('Mr. Johnson', '456 Oak St, Delhi', '456-789-0123'),
+('Mr. Patil', '789 Pine St, Pune', '789-012-3456'),
+('Mr. Joshi', '321 Maple St, Pune', '321-654-9870');
+
+-- Inserting data into Property table
+INSERT INTO Property (pno, desc, area, rate, owner_name) VALUES
+(1, 'Apartment 1', 'Mumbai', 1200, 'Mr. Smith'),
+(2, 'House 1', 'Delhi', 1500, 'Mr. Johnson'),
+(3, 'Condo 1', 'Pune', 80000, 'Mr. Patil'),
+(4, 'Villa 1', 'Pune', 100000, 'Mr. Joshi'),
+(5, 'Apartment 2', 'Pune', 90000, 'Mr. Joshi'),
+(6, 'House 2', 'Mumbai', 1100, 'Mr. Smith'),
+(7, 'Condo 2', 'Delhi', 1400, 'Mr. Johnson'),
+(8, 'Villa 2', 'Pune', 95000, 'Mr. Patil'),
+(9, 'Apartment 3', 'Mumbai', 1050, 'Mr. Smith'),
+(10, 'House 3', 'Delhi', 1600, 'Mr. Johnson');
+
+
+-- 1. Display area of property whose rate is less than 100000
+SELECT area FROM Property WHERE rate < 100000;
+
+-- 2. Give the details of owner whose property is at “Pune”
+SELECT Owner.* 
+FROM Owner 
+JOIN Property ON Owner.owner_name = Property.owner_name 
+WHERE Property.area = 'Pune';
+
+-- 3. Display area wise property details.
+SELECT area, pno, desc, rate, owner_name 
+FROM Property 
+ORDER BY area;
+
+-- 4. Display property owned by 'Mr.Patil' having minimum rate.
+SELECT * 
+FROM Property 
+WHERE owner_name = 'Mr. Patil' 
+AND rate = (SELECT MIN(rate) FROM Property WHERE owner_name = 'Mr. Patil');
+
+-- 5. Delete all properties from “Pune” owned by “Mr. Joshi”.
+DELETE FROM Property 
+WHERE area = 'Pune' 
+AND owner_name = 'Mr. Joshi';
+
+
+
+
+
+
+        
 </code>
 </pre>
 </body>
