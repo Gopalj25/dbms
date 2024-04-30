@@ -62,6 +62,56 @@ UPDATE Emp
 SET Date_Of_Joining = '2019-06-15'
 WHERE ename = 'Mr. Roy' AND dno IN (SELECT dno FROM Dept WHERE dname = 'Computer Science');
 
+--------------------------------------
+##SLIP 4
+
+CREATE TABLE Patient (
+    PCode INT PRIMARY KEY,
+    Name VARCHAR(100) NOT NULL,
+    Addr VARCHAR(255) NOT NULL,
+    Disease VARCHAR(100)
+);
+
+CREATE TABLE Bed (
+    Bed_No INT PRIMARY KEY,
+    RoomNo INT CHECK(RoomNo > Bed_No),
+    loc VARCHAR(100),
+    FOREIGN KEY (Bed_No) REFERENCES Patient(PCode)
+);
+
+-- Insert data for Patient table
+INSERT INTO Patient (PCode, Name, Addr, Disease) VALUES
+(1, 'John Doe', 'Pimple Gurav', 'Fever'),
+(2, 'Jane Smith', 'Hinjewadi', 'Cough'),
+(3, 'Alice Johnson', 'Pimple Gurav', 'Headache'),
+(4, 'Bob Williams', 'Kothrud', 'Flu'),
+(5, 'sam luthor',' Pimple Gurav','malaria'),
+(6, 'robert', 'kharadi', 'flu');
+--Insert data for Bed table
+INSERT INTO Bed (Bed_No, RoomNo, loc) VALUES
+(1, 101, 'south Wing'),
+(2, 102, 'East Wing'),
+(3, 101, 'North Wing'),
+(4, 103, 'West Wing'),
+(5, 105, 'south Wing'),
+(6, 101,'north wing');
+
+SELECT * FROM Patient WHERE Addr = 'Pimple Gurav'
+
+DELETE FROM Bed
+WHERE Bed_No = 1 AND RoomNo = 105;
+DELETE FROM Patient WHERE PCode = 1;  -- Assuming Bed_No is the same as PCode
+
+SELECT RoomNo, COUNT(*) AS Patient_Count 
+FROM Bed GROUP BY RoomNo;
+
+SELECT P.Name AS Patient_Name
+FROM Patient P 
+JOIN Bed B ON P.PCode = B.Bed_No 
+WHERE B.RoomNo = 101;
+
+SELECT Disease  FROM Patient WHERE PCode = 1; -- Assuming Bed_No is the same as PCode  
+
 </code>
 </pre>
 </body>
