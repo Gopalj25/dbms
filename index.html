@@ -375,78 +375,225 @@ AND rate = (SELECT MIN(rate) FROM Property WHERE owner_name = 'Mr. Patil');
 DELETE FROM Property 
 WHERE area = 'Pune' 
 AND owner_name = 'Mr. Joshi';
----------------------------------------------------------    
-## SLIP 16
--- Create Musician table
-CREATE TABLE Musician (
-    mno INT PRIMARY KEY,
-    mname VARCHAR(100),
-    addr VARCHAR(255),
-    phno VARCHAR(15)
+---------------------------------------------------------  
+#Slip 17
+CREATE TABLE Sailor (
+    sid INT PRIMARY KEY,
+    sname VARCHAR(255),
+    age INT CHECK (age > 0)
 );
 
--- Create Album table
-CREATE TABLE Album (
-    title VARCHAR(100) PRIMARY KEY,
-    copy_right_date DATE,
-    format VARCHAR(50),
-    mno INT,
-    FOREIGN KEY (mno) REFERENCES Musician(mno)
+
+CREATE TABLE Boats (
+    bid INT PRIMARY KEY,
+    bname VARCHAR(255),
+    color VARCHAR(50)
 );
 
--- Insert sample data into Musician table
-INSERT INTO Musician (mno, mname, addr, phno)
-VALUES
-    (1, 'A R Rehman', 'Chennai', '9876543210'),
-    (2, 'Hans Zimmer', 'Los Angeles', '1234567890'),
-    (3, 'John Williams', 'New York', '5678901234'),
-    (4, 'James Horner', 'Los Angeles', '6789012345');
+CREATE TABLE SailorBoats (
+    sid INT,
+    bid INT,
+    day varchar(10),
+    FOREIGN KEY (sid) REFERENCES Sailor(sid),
+    FOREIGN KEY (bid) REFERENCES Boats(bid),
+    PRIMARY KEY (sid, bid)
+);
 
--- Insert sample data into Album table
-INSERT INTO Album (title, copy_right_date, format, mno)
-VALUES
-    ('Jodhaa Akbar', '2008-02-12', 'Audio', 1),
-    ('Dil Se', '1998-08-21', 'Audio', 1),
-    ('The Dark Knight', '2008-07-18', 'Audio', 2),
-    ('Inception', '2010-07-16', 'Audio', 2),
-    ('Jurassic Park', '1993-06-11', 'Audio', 3),
-    ('Star Wars', '1977-05-25', 'Audio', 3),
-    ('Titanic', '1997-11-18', 'Audio', 4),
-    ('Avatar', '2009-12-18', 'Audio', 4),
-    ('Lagaan', '2001-06-15', 'Audio', 1),
-    ('Rang De Basanti', '2006-01-26', 'Audio', 1);
+INSERT INTO Sailor (sid, sname, age) VALUES
+(1, 'Ram', 25),
+(2, 'aryan', 28),
+(3, 'Ram', 25),
+(4, 'samarth', 26);
 
--- Execute the queries
+INSERT INTO Boats (bid, bname, color) VALUES
+(101, 'Sailboat1', 'Blue'),
+(102, 'Speedboat1', 'Red'),
+(103, 'Yacht1', 'White'),
+(104, 'Fishingboat1', 'Green');
 
--- 1. Display all albums composed by ‘A R Rehman’
+INSERT INTO SailorBoats (sid, bid, day) VALUES
+(1, 101, 'Tuesday'),
+(2, 102, 'Sunday'),
+(1, 103, 'Friday'),
+(4, 104, 'Monday');
+
+
+
+
+SELECT b.*
+FROM Sailor s
+JOIN SailorBoats sb ON s.sid = sb.sid
+JOIN Boats b ON sb.bid = b.bid
+WHERE s.sname = 'Ram';
+
+
+
+
+SELECT s.sname
+FROM Sailor s
+JOIN SailorBoats sb ON s.sid = sb.sid
+JOIN Boats b ON sb.bid = b.bid
+WHERE b.color = 'Blue';
+
+
+
+SELECT s.sname
+FROM Sailor s
+JOIN SailorBoats sb ON s.sid = sb.sid
+WHERE sb.day IN ('Tuesday', 'Friday')
+GROUP BY s.sid, s.sname
+HAVING COUNT(DISTINCT sb.day) = 2;
+
+
+
+SELECT b.*
+FROM Boats b
+JOIN SailorBoats sb ON b.bid = sb.bid
+WHERE sb.day = 'Sunday'
+GROUP BY b.bid, b.bname, b.color
+ORDER BY COUNT(*) DESC
+LIMIT 1;
+
+
+
 SELECT *
-FROM Album
-WHERE mno = (SELECT mno FROM Musician WHERE mname = 'A R Rehman');
+FROM Sailor
+WHERE age > 25;
 
--- 2. Display musician details who have composed Audio album
-SELECT m.*
-FROM Musician m
-JOIN Album a ON m.mno = a.mno
-WHERE a.format = 'Audio';
+--------------------------------------------------------
+#15.Bill and menu
 
--- 3. Find all musicians who have composed maximum albums
-SELECT m.mname, COUNT(a.title) AS album_count
-FROM Musician m
-LEFT JOIN Album a ON m.mno = a.mno
-GROUP BY m.mno
-HAVING COUNT(a.title) = (
-    SELECT COUNT(title)
-    FROM Album
-    GROUP BY mno
-    ORDER BY COUNT(title) DESC
-    LIMIT 1
+
+
+create table Bill(
+billno int primary key,
+day date,
+tableno int,
+total decimal(10,2) check(total>0)
 );
 
--- 4. Display musician wise album details
-SELECT m.mname, a.title, a.copy_right_date, a.format
-FROM Musician m
-JOIN Album a ON m.mno = a.mno
-ORDER BY m.mname;
+INSERT INTO Bill VALUES
+    (301, "2012-04-29", 1, 550.50),
+    (302, "2013-01-08", 2, 200.75),
+    (303, "2013-12-01", 3, 180.00),
+    (304, "2014-02-22", 4, 620.25);
+    select * from Bill;
+    
+    
+    create table Menu(
+    dish_no int primary key,
+    dish_desc varchar(50),
+    price decimal(10,2) check(price>0)
+    );
+INSERT INTO Menu
+VALUES
+    (101, 'Burger', 100.99),
+    (102, 'Vegetable stir-fry', 90.99),
+    (103, 'Pizza', 150.99),
+    (104, 'Pasta', 120.99);
+select * from Menu;
+
+create table Bill_Menu (
+    billno int,
+    dish_no int,
+    quantity int,
+    foreign key (billno) references Bill(billno),
+    foreign key (dish_no) references Menu(dish_no),
+    check (quantity > 0)
+);
+
+
+insert into Bill_Menu
+values
+    (301, 101, 2),
+    (301, 102, 1),
+    (302, 101, 1),
+    (302, 103, 1),
+    (303, 102, 2),
+    (304, 101, 1),
+    (304, 104, 1);
+select * from Bill_Menu;
+
+
+
+SELECT b.billno, m.dish_desc, m.price, bm.quantity, (m.price * bm.quantity) AS total_amount
+FROM Bill b
+JOIN Bill_Menu bm ON b.billno = bm.billno
+JOIN Menu m ON bm.dish_no = m.dish_no;
+
+
+
+SELECT SUM(b.total) AS total_amount_collected
+FROM Bill b
+WHERE b.day = '2013-01-08';
+
+
+
+SELECT COUNT(*) AS num_menus
+FROM Bill_Menu
+WHERE billno = 301;
+
+
+
+SELECT *
+FROM Menu
+WHERE price BETWEEN 100 AND 500;
+
+
+
+SELECT b.tableno, COUNT(*) AS num_bills
+FROM Bill b
+WHERE b.day = '2013-01-12'
+GROUP BY b.tableno;
+
+
+--------------------------------------------------------
+
+## SLIP 16
+create database music;
+Use music;
+create table Musicians(
+	musician_no INT AUTO_INCREMENT,
+	musician_name VARCHAR(255) NOT NULL, 
+	address VARCHAR(100), 
+	ph_no VARCHAR(15), 
+	PRIMARY KEY(musician_no)
+	);
+create table Albums( 
+	title VARCHAR(100),
+	copy_right_date DATE NOT NULL, 
+	format VARCHAR(100), 
+	musician_no INT,
+	PRIMARY KEY (title),
+	FOREIGN KEY (musician_no) REFERENCES Musicians(musician_no)
+	);
+INSERT INTO Musicians(musician_name, address, ph_no) VALUES 
+	('A R Rehman', 'Chennai, India', '9876543210'),
+	('Beyoncé', 'Los Angeles, USA', '1234567890'),
+	('Ed Sheeran', 'London, UK', '2345678901'),
+	('Taylor Swift', 'Nashville, USA', '3456789012');
+
+INSERT INTO Albums (title, copy_right_date, format, musician_no) VALUES 
+	('Rockstar', '2011-09-01', 'CD', (SELECT musician_no FROM Musicians WHERE musician_name = 'A R Rehman')), 
+	('25', '2015-11-20', 'Digital', (SELECT musician_no FROM Musicians WHERE musician_name = 'Adele')), 
+	('Lemonade', '2016-04-23', 'Vinyl', (SELECT musician_no FROM Musicians WHERE musician_name = 'Beyoncé')),
+	('Divide', '2017-03-03', 'Digital', (SELECT musician_no FROM Musicians WHERE musician_name = 'Ed Sheeran')),
+	('Folklore', '2020-07-24', 'CD', (SELECT musician_no FROM Musicians WHERE musician_name = 'Taylor Swift')), 
+	('Roja', '1992-08-15', 'CD', (SELECT musician_no FROM Musicians WHERE musician_name = 'A R Rehman'));
+
+#Display all albums composed by ‘A R Rehman’.
+SELECT * FROM Albums a JOIN Musicians m ON a.musician_no = m.musician_no WHERE m.musician_name = 'A R Rehman';
+
+#Display musician details who have composed Audio album.
+SELECT * FROM Musicians m JOIN Albums a ON m.musician_no = a.musician_no WHERE a.format = 'DIGITAL';
+
+#Find all musicians who have composed maximum albums.
+SELECT m.musician_no, m.musician_name, COUNT(a.title) AS NumberOfAlbums FROM Musicians m JOIN Albums a ON m.musician_no = a.musician_no GROUP BY m.musician_no, m.musician_name HAVING COUNT(a.title) = ( SELECT MAX(AlbumCount) FROM (SELECT musician_no, COUNT(title) AS AlbumCount FROM Albums GROUP BY musician_no ) AS AlbumCounts );
+
+#Display musician wise album details.
+SELECT * FROM Musicians m JOIN Albums a ON m.musician_no = a.musician_no ORDER BY m.musician_name;
+
+
 --------------------------------------------------------
     ## SLIP 26
 CREATE TABLE ITEM (
