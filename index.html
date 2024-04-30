@@ -62,7 +62,7 @@ SET Date_Of_Joining = '2019-06-15'
 WHERE ename = 'Mr. Roy' AND dno IN (SELECT dno FROM Dept WHERE dname = 'Computer Science');
 
 --------------------------------------
-##SLIP 4
+   ##  SLIP 4
 
 CREATE TABLE Patient (
     PCode INT PRIMARY KEY,
@@ -84,32 +84,45 @@ INSERT INTO Patient (PCode, Name, Addr, Disease) VALUES
 (2, 'Jane Smith', 'Hinjewadi', 'Cough'),
 (3, 'Alice Johnson', 'Pimple Gurav', 'Headache'),
 (4, 'Bob Williams', 'Kothrud', 'Flu'),
-(5, 'sam Luthor', 'Pimple Gurav', 'malaria'),
-(6, 'Robert', 'kharadi', 'flu');
+(5, 'Sam Luthor', 'Pimple Gurav', 'malaria'),
+(6, 'Robert Junior', 'kharadi', 'flu'),
+(7, 'Emily Davis', 'Pimple Gurav', 'Migraine'),
+(8, 'David Wilson', 'PQR Street', 'Arthritis');
 --Insert data for Bed table
 INSERT INTO Bed (Bed_No, RoomNo, loc) VALUES
-(1, 105, 'South Wing'),
-(2, 102, 'East Wing'),
-(3, 102, 'North Wing'),
-(4, 103, 'West Wing'),
-(5, 105, 'South Wing'),
-(6, 101, 'north wing');
+(1, 105, 'E'),
+(2, 101, 'A'),
+(3, 101, 'A'),
+(4, 102, 'B'),
+(5, 103, 'C'),
+(6, 105, 'E'),
+(7, 103, 'C'),
+(8, 104, 'H');
 
-SELECT * FROM Patient WHERE Addr = 'Pimple Gurav'
+--details of patients who are from “Pimple Gurav”
+SELECT * FROM Patient 
+WHERE Addr = 'Pimple Gurav';
 
-DELETE FROM Bed
-WHERE Bed_No = 1 AND RoomNo = 105;
-DELETE FROM Patient WHERE PCode = 1;  -- Assuming Bed_No is the same as PCode
-
+--the count of patient room wise.
 SELECT RoomNo, COUNT(*) AS Patient_Count 
 FROM Bed GROUP BY RoomNo;
 
+--the names of patients who are admitted in room no 101.
 SELECT P.Name AS Patient_Name
 FROM Patient P 
 JOIN Bed B ON P.PCode = B.Bed_No 
 WHERE B.RoomNo = 101;
 
-SELECT Disease  FROM Patient WHERE PCode = 1; -- Assuming Bed_No is the same as PCode  
+--the disease of patient whose bed_No is 1.
+SELECT Disease
+FROM Patient
+WHERE PCode = (SELECT Bed_No FROM Bed WHERE Bed_No = 1);
+
+--Deleting the details of patient whose Bed_No is 1 and RoomNo is 105.
+DELETE FROM Bed
+WHERE Bed_No = 1 AND RoomNo = 105;
+DELETE FROM Patient WHERE PCode = 1;  -- Assuming Bed_No is the same as PCode
+
 
 -------------------------------------
 ## SLIP 5
